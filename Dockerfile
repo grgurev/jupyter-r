@@ -24,7 +24,8 @@ RUN echo "auth requisite pam_deny.so" >> /etc/pam.d/su && \
   sed -i.bak -e 's/^%sudo/#%sudo/' /etc/sudoers && \
   useradd -m -s /bin/bash -N -u $NB_UID $NB_USER && \
 	echo "$NB_USER ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/$NB_USER && \
-  chmod g+w /etc/passwd
+  chmod g+w /etc/passwd && \
+	addgroup $NB_USER staff
 
 ENV DPKGSPY python3-pip python3-setuptools nodejs npm
 RUN apt-get update && apt-get install -y --no-install-recommends ${DPKGSPY} && \
@@ -48,4 +49,17 @@ EXPOSE 8888
 
 CMD ["jupyter", "lab", "--ip=0.0.0.0", "--port=8888", "--no-browser"]
 
-COPY jupyter-user-settings $HOME/.jupyter/lab/user-settings
+COPY .jupyter $HOME/.jupyter
+
+USER root
+
+ENV DPKGSR r-base r-base-dev
+RUN apt-get update && apt-get install -y --no-install-recommends ${DPKGSR} && \
+  rm -rf /tmp/downloaded_packages/ /tmp/*.rds && \
+  rm -rf /var/lib/apt/lists/*
+
+USER $NB_UID
+
+ENV RPKGS IRdisplay IRkernel data.table
+RUN Rscript -e "install.packages(commandArgs(TRUE), type = 'source')" ${RPKGS} && \
+  Rscript -e "IRkernel::installspec()"
