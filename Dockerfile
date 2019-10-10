@@ -1,6 +1,6 @@
 FROM debian:testing-slim AS python
 
-ARG NB_USER="marin"
+ARG NB_USER="docker"
 ARG NB_UID="1000"
 ARG NB_GID="100"
 
