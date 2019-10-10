@@ -8,9 +8,9 @@ USER root
 
 ENV DPKGSCONF wget sudo locales
 RUN apt-get update && apt-get -y dist-upgrade && \
- 	apt-get install -y --no-install-recommends ${DPKGSCONF} && \
- 	rm -rf /tmp/downloaded_packages/ /tmp/*.rds && \
- 	rm -rf /var/lib/apt/lists/*
+	apt-get install -y --no-install-recommends ${DPKGSCONF} && \
+	rm -rf /tmp/downloaded_packages/ /tmp/*.rds && \
+	rm -rf /var/lib/apt/lists/*
 
 RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && locale-gen
 
@@ -20,8 +20,6 @@ ENV HOME=/home/$NB_USER
 RUN sed -i 's/^#force_color_prompt=yes/force_color_prompt=yes/' /etc/skel/.bashrc
 
 RUN echo "auth requisite pam_deny.so" >> /etc/pam.d/su && \
-  sed -i.bak -e 's/^%admin/#%admin/' /etc/sudoers && \
-  sed -i.bak -e 's/^%sudo/#%sudo/' /etc/sudoers && \
   useradd -m -s /bin/bash -N -u $NB_UID $NB_USER && \
 	echo "$NB_USER ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/$NB_USER && \
   chmod g+w /etc/passwd && \
@@ -32,8 +30,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends ${DPKGSPY} && \
 	ln -s /usr/bin/pip3 /usr/bin/pip && \
 	npm install npm@latest -g && \
 	chown -R 1000:100 "/home/$NB_USER/.npm" && \
-  rm -rf /tmp/downloaded_packages/ /tmp/*.rds && \
-  rm -rf /var/lib/apt/lists/*
+	rm -rf /tmp/downloaded_packages/ /tmp/*.rds && \
+	rm -rf /var/lib/apt/lists/*
 
 USER $NB_UID
 WORKDIR $HOME/project
@@ -55,11 +53,11 @@ USER root
 
 ENV DPKGSR r-base r-base-dev
 RUN apt-get update && apt-get install -y --no-install-recommends ${DPKGSR} && \
-  rm -rf /tmp/downloaded_packages/ /tmp/*.rds && \
-  rm -rf /var/lib/apt/lists/*
+	rm -rf /tmp/downloaded_packages/ /tmp/*.rds && \
+	rm -rf /var/lib/apt/lists/*
 
 USER $NB_UID
 
 ENV RPKGS IRdisplay IRkernel data.table
 RUN Rscript -e "install.packages(commandArgs(TRUE), type = 'source')" ${RPKGS} && \
-  Rscript -e "IRkernel::installspec()"
+	Rscript -e "IRkernel::installspec()"
