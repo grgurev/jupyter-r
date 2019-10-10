@@ -6,7 +6,7 @@ ARG NB_GID="100"
 
 USER root
 
-ENV DPKGSCONF wget sudo locales
+ARG DPKGSCONF="wget sudo locales"
 RUN apt-get update && apt-get -y dist-upgrade && \
 	apt-get install -y --no-install-recommends ${DPKGSCONF} && \
 	rm -rf /tmp/downloaded_packages/ /tmp/*.rds && \
@@ -25,7 +25,7 @@ RUN echo "auth requisite pam_deny.so" >> /etc/pam.d/su && \
   chmod g+w /etc/passwd && \
 	addgroup $NB_USER staff
 
-ENV DPKGSPY python3-pip python3-setuptools nodejs npm
+ARG DPKGSPY="python3-pip python3-setuptools nodejs npm"
 RUN apt-get update && apt-get install -y --no-install-recommends ${DPKGSPY} && \
 	ln -s /usr/bin/pip3 /usr/bin/pip && \
 	npm install npm@latest -g && \
@@ -51,13 +51,13 @@ COPY .jupyter $HOME/.jupyter
 
 USER root
 
-ENV DPKGSR r-base r-base-dev
+ARG DPKGSR="r-base r-base-dev"
 RUN apt-get update && apt-get install -y --no-install-recommends ${DPKGSR} && \
 	rm -rf /tmp/downloaded_packages/ /tmp/*.rds && \
 	rm -rf /var/lib/apt/lists/*
 
 USER $NB_UID
 
-ENV RPKGS IRdisplay IRkernel data.table
+ARG RPKGS="IRdisplay IRkernel data.table"
 RUN Rscript -e "install.packages(commandArgs(TRUE), type = 'source')" ${RPKGS} && \
 	Rscript -e "IRkernel::installspec()"
